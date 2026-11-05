@@ -11,7 +11,7 @@ export function fitInvite(type, core) {
   for(const opening of [t.open,'Rally up!','']) {
     for(const call of [...t.calls,'']) {
       for(const ending of [...t.ends,'']) {
-        candidates.push((opening?'#R'+opening+' ':'')+core+(call?' #G'+call:'')+(ending?' #Y'+ending:''));
+        candidates.push((opening?'#G'+opening+' ':'')+core+(call?' #W'+call:'')+(ending?' #Y'+ending:''));
       }
     }
   }
@@ -33,7 +33,7 @@ export function formatInvite(raw, options = {}) {
   const title=type==='fleet'?'Voyager Fleet':`Calamity ${type[0].toUpperCase()+type.slice(1)}`;
   const prefix=size&&['zone','nest'].includes(type)?size[0].toUpperCase()+size.slice(1).toLowerCase()+' ':'';
   const location=`[World ${world}(${coord[1]},${coord[2]})]`;
-  const core='#Y'+prefix+title+(towerName?' - '+towerName:'')+(level?' #RLv'+level:'')+' #W'+location;
+  const core='#Y'+prefix+title+(towerName?' - '+towerName:'')+(level?' #GLv'+level:'')+' #W'+location;
   const output=fitInvite(type,core),count=output.length;
   const warning=type==='tower'&&!level?'Tower level not selected. Choose Lv80, Lv90 or Lv100 so teammates know the difficulty.':'';
   return {ok:count<=LIMIT,type,world,area,size:prefix.trim(),level,levelSource:chosen?'selected':(pastedLevel?'pasted':''),towerName,location,output,count,warning,error:count>LIMIT?'Essential details exceed 130 characters. Copy disabled; nothing was truncated.':''};
@@ -48,7 +48,7 @@ if(typeof document!=='undefined') {
   const input=document.querySelector('#invite-input'),output=document.querySelector('#invite-output'),preview=document.querySelector('#invite-preview'),status=document.querySelector('#invite-status'),count=document.querySelector('#invite-count'),copy=document.querySelector('#invite-copy');
   const levelBox=document.querySelector('#tower-level-box'),levelNote=document.querySelector('#tower-level-note');
   const rules=document.querySelector('details ul');
-  if(rules) {const li=document.createElement('li');li.textContent='Expanded invitations use red openings, yellow events and punchlines, green calls to join, and white locations. The longest complete template fitting 130 characters is selected automatically.';rules.append(li);const li2=document.createElement('li');li2.textContent='Calamity Tower level (Lv80, Lv90 or Lv100) is protected: it is always included when selected and is never dropped to save characters.';rules.append(li2);}
+  if(rules) {const li=document.createElement('li');li.textContent='Expanded invitations use green openings and levels, yellow events and punchlines, and white locations and calls to join. The longest complete template fitting 130 characters is selected automatically.';rules.append(li);const li2=document.createElement('li');li2.textContent='Calamity Tower level (Lv80, Lv90 or Lv100) is protected: it is always included when selected and is never dropped to save characters.';rules.append(li2);}
   const selectedLevel=()=>document.querySelector('input[name="tower-level"]:checked')?.value||'';
   function update() {
     const r=formatInvite(input.value,{towerLevel:selectedLevel()});
@@ -58,7 +58,7 @@ if(typeof document!=='undefined') {
     levelNote.textContent=isTower?(r.level?`Level included: Lv${r.level} (${r.levelSource||'pasted'}).`:'Select a level before copying this tower invite.'):'';
     output.value=r.output||'';preview.replaceChildren();count.textContent=`${r.count||0}/130 characters (including codes)${r.output?' · '+Math.max(0,LIMIT-r.count)+' remaining':''}`;copy.disabled=!r.ok;
     status.textContent=r.output?`Detected: ${r.type}. World ${r.world}.${r.area?' Removed area: '+r.area+'.':''} ${r.error||r.warning||'Invitation fitted to budget. Ready to test in game.'}`:r.error;
-    if(r.output) {let colour='#fff';for(const part of r.output.split(/(#[YRWG])/)) {if(/^#[YRWG]$/.test(part)) colour=({'#Y':'#ffff00','#R':'#ff0000','#W':'#ffffff','#G':'#00ff00'})[part];else {const span=document.createElement('span');span.style.color=colour;span.textContent=part;preview.append(span);}}}
+    if(r.output) {let colour='#fff';for(const part of r.output.split(/(#[YWG])/)) {if(/^#[YWG]$/.test(part)) colour=({'#Y':'#ffff00','#W':'#ffffff','#G':'#00ff00'})[part];else {const span=document.createElement('span');span.style.color=colour;span.textContent=part;preview.append(span);}}}
   }
   input.addEventListener('input',update);
   document.querySelectorAll('input[name="tower-level"]').forEach(i=>i.addEventListener('change',update));
