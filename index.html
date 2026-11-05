@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="google-site-verification" content="s6ufCC7CSQyoGo_5M1eioyyB64Viygwcv5nrCpA8E9o">
+	<meta
+		http-equiv="Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' font.googleapis.com fonts.gstatic.com; img-src 'self'; font-src 'self' font.googleapis.com fonts.gstatic.com; connect-src 'none'; media-src 'none'; object-src 'none'; prefetch-src 'self'; child-src 'none'; frame-src 'none'; worker-src 'none'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; manifest-src 'self'; require-trusted-types-for 'script';">
+	<title>Chat Colorizer Once Human</title>
+	<base href="./">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="preload" href="scripts/image-loader.js" as="script">
+	<link rel="preload" href="css/core.css" as="style">
+	<link id="font-link" rel="stylesheet">
+	<link rel="stylesheet" href="css/core.css">
+	<link rel="icon" href="favicon.svg" type="image/svg+xml">
+	<link rel="stylesheet" href="css/additional.css">
+	<link rel="prefetch" href="images/once-human-background-low-res1.webp" as="image" type="image/webp">
+	<link rel="prefetch" href="images/once-human-background-low-res2.webp" as="image" type="image/webp">
+	<link rel="prefetch" href="images/once-human-background-low-res3.webp" as="image" type="image/webp">
+	<link rel="prefetch" href="images/once-human-background-low-res4.webp" as="image" type="image/webp">
+	<link rel="prefetch" href="images/once-human-background-low-res5.webp" as="image" type="image/webp">
+	<link rel="canonical" href="https://janne.dev/chat-color/">
+	<meta name="title" content="Chat Colorizer for Once Human">
+	<meta name="description"
+		content="A tool for creating colored text chat messages using color codes for the video game 'Once Human'.">
+	<meta name="keywords"
+		content="chat, text, color, colour, colored, colorizer, picker, generator, tool, app, webapp, once human, once, human, video, game, videogame, rainbow, hues, theme">
+	<meta property="og:type" content="website">
+	<meta property="og:image:url" content="https://janne.dev/chat-color/images/chat-colorizer-once-human.webp">
+	<meta property="og:image:type" content="images/webp">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt"
+		content="Screenshot of a user interface showing a text window displaying text rendered in alternating colours, with buttons underneath labelled color and apply">
+	<meta property="og:title" content="Chat Colorizer for Once Human">
+	<meta property="og:url" content="https://janne.dev/chat-color/">
+	<meta property="og:description"
+		content="A tool for creating colored text chat messages using color codes for the video game 'Once Human'.">
+	<meta property="og:locale" content="en_US">
+	<meta property="og:locale:alternate" content="en_GB">
+	<meta name="robots" content="index, follow">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="language" content="English">
+</head>
+
+<body>
+	<div class="background fade-in" style="animation: fadeInBackground-1 2s ease-in-out forwards;">
+
+		<h1>Chat Color<span class="collapse">izer</span> for Once Human</h1>
+		<details aria-live="polite">
+			<summary>How to Use:</summary>
+			<ol>
+				<li>Enter a message.</li>
+				<li>Choose a color.</li>
+				<li>Highlight <span class="collapse">some </span>text and <span class="collapse">click </span>'Apply'.
+				</li>
+				<li>Or, pick a preset or random <span class="collapse">color </span>theme.
+				</li>
+				<li>'Copy' <span class="collapse">then paste </span>the output <span class="collapse">code </span>into
+					chat.
+				</li>
+			</ol>
+		</details>
+		<div class="message-container">
+			<div id="message-input" class="message-input" contenteditable="true"
+				data-placeholder="Type your message here..." data-min-placeholder="Type message here" spellcheck="true"
+				aria-label="Message Input" role="textbox"></div>
+			<div id="message-warning" popover role="alert">
+				<div>
+					<span>Please select text then apply</span>
+				</div>
+			</div>
+			<div id="enter-message-warning" popover role="alert">
+				<div>
+					<span>Enter text then select theme</span>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="controls-container">
+			<div class="color-picker-container">
+				<label id="color-picker-label" for="color-picker">Color:</label>
+				<input id="color-picker" type="color" value="#ffffff">
+				<button id="apply-button">Apply</button>
+			</div>
+			<div class="select-container">
+				<label id="preset-select-label" for="preset-select" class="collapse">Theme:</label>
+				<select id="preset-select">
+					<option value="pastelRainbow" selected>Pastel Rainbow</option>
+					<option value="galaxyNebula">Galaxy Nebula</option>
+					<option value="warpStorm">Warp Storm</option>
+					<option value="sunrise">Sunrise</option>
+					<option value="sharkPlush">Shark Plush</option>
+					<option value="morningLight">Morning Light</option>
+					<option value="brazil">Fenomeno</option>
+					<option value="vintagePoster">Vintage Poster</option>
+					<option value="randomChalk">Random Chalk</option>
+					<option value="randomHue">Random Hue</option>
+				</select>
+
+				<button id="apply-preset-button" class="collapse" aria-label="randomize" disabled><img
+						src="icons/rotate-solid.svg" alt="Randomize"></button>
+				<div></div>
+			</div>
+
+			<div class="contrast-container" tabindex="0">
+				<label id="contrast-meter-label" for="contrast-meter">Clarity:</label>
+				<meter id="contrast-meter" min="0" max="10" low="3.6" optimum="6" value="10" aria-live="polite"></meter>
+				<div id="contrast-meter-message-warning" popover role="alert">
+					<div>
+						<span>Dark colors are hard to read. Blue and red are particularly
+							difficult.</span>
+					</div>
+				</div>
+			</div>
+
+			<button id="reset-button">Reset</button>
+		</div>
+
+		<div class="output-container">
+			<h2 id="output-heading">Output Code</h2>
+			<textarea id="output-code" class="output-code" readonly maxlength="130"
+				aria-labelledby="output-heading"></textarea>
+			<div class="output-footer">
+				<button id="copy-code" aria-label="copy output code" class="icon-button"><img
+						src="icons/copy-regular.svg" alt="" role="presentation">Copy</button>
+				<div class="char-counter" id="char-counter" aria-label="character limit counter" aria-live="polite">
+					0/130<span class="collapse"> characters</span></div>
+			</div>
+			<div id="confirm-message" popover role="alert">
+				<div>Copied to clipboard</div>
+			</div>
+		</div>
+		<footer>Please use considerately <span aria-label="heart">&lt;3</span>
+		</footer>
+
+	</div>
+	<script src="scripts/image-loader.js" async></script>
+	<script src="scripts/font-loader.js" async></script>
+	<script src="scripts/main.js" defer></script>
+</body>
+
+</html>

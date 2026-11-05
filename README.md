@@ -1,2 +1,5 @@
-# chat-colorizer-once-human
-Standalone base for a customised Once Human chat colorizer, based on jann3/chat-colorizer-once-human.
+# Chat Colorizer for Once Human
+
+A tool for creating colored text chat messages using color codes for the
+videogame 'Once Human' currently hosted on
+[janne.dev](https://janne.dev/chat-color)
