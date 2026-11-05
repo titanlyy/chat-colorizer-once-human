@@ -1,0 +1,32 @@
+name: Import original colorizer base
+on:
+  push:
+    paths:
+      - '.github/workflows/import-base.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import source once
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f UPSTREAM.md ]; then
+            echo 'Source already imported; skipping.'
+            exit 0
+          fi
+          git clone --depth 1 https://github.com/jann3/chat-colorizer-once-human.git /tmp/colorizer-upstream
+          SOURCE_COMMIT=$(git -C /tmp/colorizer-upstream rev-parse HEAD)
+          rm -rf /tmp/colorizer-upstream/.git
+          cp -a /tmp/colorizer-upstream/. .
+          sed -i 's|<base href="/chat-color/">|<base href="./">|' index.html
+          printf '# Original source attribution\n\nSource: https://github.com/jann3/chat-colorizer-once-human\nOriginal author: Janne\nLicence: MIT; see LICENSE.\nImported commit: %s\n\nThis is a standalone copy, not a GitHub fork. The HTML base path was changed to ./ for independent hosting.\n' "$SOURCE_COMMIT" > UPSTREAM.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "Import original MIT-licensed colorizer base ($SOURCE_COMMIT)"
+          git push origin HEAD:main
