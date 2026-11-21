@@ -8,7 +8,7 @@ const movements = {
 };
 
 const PALETTES = {
-  terror:  ['FFFFFF', 'F5E0FF', 'E8C0FF', 'DBA0FF', 'C880FF'], // clear white → light purple
+  terror:  ['FFFFFF', 'F5E0FF', 'E8C0FF', 'DBA0FF', 'C880FF'], // white → light purple, one way
   lament:  ['A0FFFF', '70F0FF', '40E0FF', '10D0FF'],
   wrath:   ['FFA0A0', 'FF7070', 'FF4040', 'FF1010'],
   delight: ['FFFFA0', 'FFFF70', 'FFFF40', 'FFFF10']
@@ -21,13 +21,18 @@ function extractCoords(raw) {
 
 function colorizeGradient(text, palette, chunkSize) {
   if (!text) return '';
-  let result = '';
-  let idx = 0;
+  const chunks = [];
   for (let i = 0; i < text.length; i += chunkSize) {
-    const chunk = text.slice(i, i + chunkSize);
-    const hex = palette[idx % palette.length];
-    result += `#c${hex}${chunk}`;
-    idx++;
+    chunks.push(text.slice(i, i + chunkSize));
+  }
+  const n = chunks.length;
+  let result = '';
+  for (let i = 0; i < n; i++) {
+    // Map 0..n-1 onto 0..palette.length-1 without wrapping
+    const progress = n <= 1 ? 0 : i / (n - 1);
+    const colorIdx = Math.round(progress * (palette.length - 1));
+    const hex = palette[Math.min(colorIdx, palette.length - 1)];
+    result += `#c${hex}${chunks[i]}`;
   }
   return result;
 }
@@ -49,7 +54,6 @@ export function formatResonance(raw, movementKey) {
   ];
 
   let best = null;
-  // Prefer smaller chunks (3–4) so the white→purple gradient is visible
   for (const tpl of templates) {
     for (let chunk = 3; chunk <= 4; chunk++) {
       const grad = colorizeGradient(m.full, palette, chunk);
@@ -61,7 +65,6 @@ export function formatResonance(raw, movementKey) {
     if (best) break;
   }
 
-  // Fallback to other chunk sizes if needed
   if (!best) {
     for (const tpl of templates) {
       for (let chunk = 2; chunk <= 6; chunk++) {
