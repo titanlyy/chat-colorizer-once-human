@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Once Human Resonance Invite Formatter</title>
+  <link rel="stylesheet" href="css/resonance.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<main>
+  <nav>
+    <a href="index.html">Original colour editor</a> ·
+    <a href="invites.html">Calamity / Fleet invites</a> ·
+    <a href="LICENSE">MIT licence</a>
+  </nav>
+  <h1>Dissonant Resonance Invite Formatter</h1>
+  <p>Paste a location. Pick a movement. Get a colourful, short invite ready to paste in-game.</p>
+
+  <label for="location-input">Location (paste anything that contains coordinates)</label>
+  <textarea id="location-input" rows="3" placeholder="World Vision1, Monolith: Exo (4800.00,576.00)"></textarea>
+
+  <fieldset>
+    <legend>Movement type</legend>
+    <div class="movement-grid">
+      <label class="movement-choice" style="--swatch:#AA00FF">
+        <input type="radio" name="movement" value="terror" checked>
+        <span class="swatch"></span>
+        Movement of Terror
+      </label>
+      <label class="movement-choice" style="--swatch:#00FFFF">
+        <input type="radio" name="movement" value="lament">
+        <span class="swatch"></span>
+        Movement of Lament
+      </label>
+      <label class="movement-choice" style="--swatch:#FF0000">
+        <input type="radio" name="movement" value="wrath">
+        <span class="swatch"></span>
+        Movement of Wrath
+      </label>
+      <label class="movement-choice" style="--swatch:#FFFF00">
+        <input type="radio" name="movement" value="delight">
+        <span class="swatch"></span>
+        Movement of Delight
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="buttons">
+    <button id="sample-btn">Sample location</button>
+    <button id="clear-btn">Clear</button>
+  </div>
+
+  <p id="status" role="status" aria-live="polite"></p>
+
+  <h2>Approximate colour preview</h2>
+  <div id="preview" class="preview"></div>
+
+  <label for="output">Chat code</label>
+  <textarea id="output" rows="3" readonly></textarea>
+  <p id="count" aria-live="polite"></p>
+  <button id="copy" disabled>Copy invite</button>
+
+  <details>
+    <summary>Formatting notes</summary>
+    <ul>
+      <li>130-character limit (JavaScript UTF-16 length, including all colour codes).</li>
+      <li>World / area text is stripped; only the coordinates are kept so the location link stays clean.</li>
+      <li>Movement name uses its signature colour via <code>#cHEX</code>. Openings and calls use short codes for space.</li>
+      <li>Several call-to-action phrases are tried; the longest version that fits is chosen automatically.</li>
+      <li>Test the copied code in-game to confirm the coordinate clickability.</li>
+    </ul>
+  </details>
+
+  <footer>Based on Janne's MIT-licensed Once Human Chat Colorizer. Resonance formatter is an experimental addition.</footer>
+</main>
+<script type="module" src="scripts/resonance.js"></script>
+</body>
+</html>
