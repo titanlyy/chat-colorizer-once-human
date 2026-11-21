@@ -7,13 +7,18 @@ const movements = {
   delight: { name: 'Movement of Delight', short: 'Delight', hex: 'FFFF00', css: '#FFFF00' }
 };
 
+// Gradient palettes
+const PALETTES = {
+  terror:  ['D9A0FF', 'C070FF', 'AA40FF', '9010FF', 'AA40FF', 'C070FF'], // light purple → deeper purple
+  lament:  ['A0FFFF', '70F0FF', '40E0FF', '10D0FF', '40E0FF', '70F0FF'], // light cyan → deeper cyan
+  wrath:   ['FFA0A0', 'FF7070', 'FF4040', 'FF1010', 'FF4040', 'FF7070'], // light red → deeper red
+  delight: ['FFFFA0', 'FFFF70', 'FFFF40', 'FFFF10', 'FFFF40', 'FFFF70']  // light yellow → deeper yellow
+};
+
 function extractCoords(raw) {
   const m = raw.match(/\(\s*([+-]?\d+(?:\.\d+)?)\s*,\s*([+-]?\d+(?:\.\d+)?)\s*\)/);
   return m ? `(${m[1]},${m[2]})` : null;
 }
-
-// Sunrise gradient palette (warm reds → oranges → yellow)
-const SUNRISE = ['FF5858', 'FF6938', 'FB8F23', 'FCB138', 'FFEB46', 'FCB138', 'FB8F23'];
 
 function colorizeGradient(text, palette) {
   if (!text) return '';
@@ -23,7 +28,6 @@ function colorizeGradient(text, palette) {
   for (let i = 0; i < words.length; i++) {
     if (i > 0) result += ' ';
     const word = words[i];
-    // Split longer words into 2–4 character chunks for the gradient effect
     const chunkSize = Math.max(2, Math.ceil(word.length / 3));
     for (let j = 0; j < word.length; j += chunkSize) {
       const chunk = word.slice(j, j + chunkSize);
@@ -40,19 +44,20 @@ export function formatResonance(raw, movementKey) {
   if (!coords) return { ok: false, error: 'No coordinates found. Paste a location that includes (x,y).' };
 
   const m = movements[movementKey] || movements.terror;
+  const palette = PALETTES[movementKey] || PALETTES.terror;
 
-  let output = '';
-  if (movementKey === 'terror') {
-    const phrase = 'Join us! NONSTOP Terror Movement Spam';
-    const colored = colorizeGradient(phrase, SUNRISE);
-    output = `${colored} #W${coords}`;
-  } else {
-    // Fallback for other movements (can expand later)
-    const core = `#c${m.hex}${m.name} #W${coords}`;
-    output = core;
-  }
+  const phrases = {
+    terror:  'Join us! NONSTOP Terror Movement Spam',
+    lament:  'Join us! NONSTOP Lament Movement Spam',
+    wrath:   'Join us! NONSTOP Wrath Movement Spam',
+    delight: 'Join us! NONSTOP Delight Movement Spam'
+  };
 
+  const phrase = phrases[movementKey] || phrases.terror;
+  const colored = colorizeGradient(phrase, palette);
+  const output = `${colored} #W${coords}`;
   const count = output.length;
+
   return {
     ok: count <= LIMIT,
     movement: m.name,
