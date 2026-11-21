@@ -19,6 +19,12 @@ function extractCoords(raw) {
   return m ? `(${m[1]},${m[2]})` : null;
 }
 
+function extractWorld(raw) {
+  // World Vision1 → W1 ; World 11 → W11 ; etc.
+  const m = raw.match(/World\s+(?:Vision)?\s*(\d+)/i);
+  return m ? `W${m[1]}` : null;
+}
+
 function colorizeGradient(text, palette, chunkSize) {
   if (!text) return '';
   const chunks = [];
@@ -40,21 +46,25 @@ export function formatResonance(raw, movementKey) {
   const coords = extractCoords(raw);
   if (!coords) return { ok: false, error: 'No coordinates found. Paste a location that includes (x,y).' };
 
+  const world = extractWorld(raw);
+  const worldTag = world ? ` @ ${world}` : '';
+
   const m = movements[movementKey] || movements.terror;
   const palette = PALETTES[movementKey] || PALETTES.terror;
 
   const templates = [
-    (grad) => `#cFF2E9AJoin us! #c00E5FFNONSTOP ${grad} #c00E5FFSpam ${coords}`,
-    (grad) => `#cFF2E9AJoin us! #c00E5FFNONSTOP ${grad} ${coords}`,
-    (grad) => `#c00E5FFNONSTOP ${grad} #c00E5FFSpam ${coords}`,
-    (grad) => `#c00E5FFNONSTOP ${grad} ${coords}`,
-    (grad) => `${grad} #c00E5FFSpam ${coords}`,
-    (grad) => `${grad} ${coords}`
+    (grad) => `#cFF2E9AJoin us! #c00E5FFNONSTOP ${grad} #c00E5FFSpam${worldTag} ${coords}`,
+    (grad) => `#cFF2E9AJoin us! #c00E5FFNONSTOP ${grad}${worldTag} ${coords}`,
+    (grad) => `#c00E5FFNONSTOP ${grad} #c00E5FFSpam${worldTag} ${coords}`,
+    (grad) => `#c00E5FFNONSTOP ${grad}${worldTag} ${coords}`,
+    (grad) => `${grad} #c00E5FFSpam${worldTag} ${coords}`,
+    (grad) => `${grad}${worldTag} ${coords}`
   ];
 
   let best = null;
+  // Prefer slightly larger chunks (4–5) so the extra @ W# still fits
   for (const tpl of templates) {
-    for (let chunk = 3; chunk <= 4; chunk++) {
+    for (let chunk = 4; chunk <= 5; chunk++) {
       const grad = colorizeGradient(m.full, palette, chunk);
       const cand = tpl(grad);
       if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
@@ -66,7 +76,7 @@ export function formatResonance(raw, movementKey) {
 
   if (!best) {
     for (const tpl of templates) {
-      for (let chunk = 2; chunk <= 6; chunk++) {
+      for (let chunk = 3; chunk <= 6; chunk++) {
         const grad = colorizeGradient(m.full, palette, chunk);
         const cand = tpl(grad);
         if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
@@ -78,7 +88,7 @@ export function formatResonance(raw, movementKey) {
   }
 
   if (!best) {
-    best = `#c${palette[0]}${m.name} ${coords}`;
+    best = `#c${palette[0]}${m.name}${worldTag} ${coords}`;
   }
 
   const count = best.length;
@@ -86,6 +96,7 @@ export function formatResonance(raw, movementKey) {
     ok: count <= LIMIT,
     movement: m.full,
     coords,
+    world,
     output: best,
     count,
     error: count > LIMIT ? 'Could not fit essential details under 130 characters.' : ''
@@ -111,7 +122,7 @@ if (typeof document !== 'undefined') {
     countEl.textContent = `${r.count || 0}/130 characters (including codes)${r.output ? ' · ' + Math.max(0, LIMIT - r.count) + ' remaining' : ''}`;
     copy.disabled = !r.ok;
     status.textContent = r.output
-      ? `Movement: ${r.movement}. Coordinates: ${r.coords}. ${r.error || 'Fitted under 130. Ready to copy.'}`
+      ? `Movement: ${r.movement}.${r.world ? ' World: ' + r.world + '.' : ''} Coordinates: ${r.coords}. ${r.error || 'Fitted under 130. Ready to copy.'}`
       : r.error;
 
     if (r.output) {
@@ -136,7 +147,7 @@ if (typeof document !== 'undefined') {
   document.querySelectorAll('input[name="movement"]').forEach(el => el.addEventListener('change', update));
 
   document.querySelector('#sample-btn').addEventListener('click', () => {
-    input.value = 'World Vision1, Monolith: Exo (4800.00,576.00)';
+    input.value = 'World Vision1, Monolith: Exo (4544.00,576.00)';
     update();
   });
 
