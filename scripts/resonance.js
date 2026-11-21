@@ -20,8 +20,9 @@ function extractCoords(raw) {
 }
 
 function extractWorld(raw) {
+  // World Vision1 → World1 ; World 11 → World11
   const m = raw.match(/World\s+(?:Vision)?\s*(\d+)/i);
-  return m ? `W${m[1]}` : null;
+  return m ? `World${m[1]}` : null;
 }
 
 function colorizeGradient(text, palette, chunkSize) {
@@ -46,7 +47,7 @@ export function formatResonance(raw, movementKey) {
   if (!coords) return { ok: false, error: 'No coordinates found. Paste a location that includes (x,y).' };
 
   const world = extractWorld(raw);
-  const worldTag = world ? ` @ ${world}` : '';
+  const worldTag = world ? ` @ #W${world}` : '';
 
   const m = movements[movementKey] || movements.terror;
   const palette = PALETTES[movementKey] || PALETTES.terror;
