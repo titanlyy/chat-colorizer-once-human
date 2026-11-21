@@ -1,4 +1,4 @@
-export const LIMIT = 130;
+export const LIMIT = 140;
 
 const movements = {
   terror:  { name: 'Terror',  full: 'Movement of Terror' },
@@ -20,7 +20,6 @@ function extractCoords(raw) {
 }
 
 function extractWorld(raw) {
-  // World Vision1 → W1 ; World 11 → W11 ; etc.
   const m = raw.match(/World\s+(?:Vision)?\s*(\d+)/i);
   return m ? `W${m[1]}` : null;
 }
@@ -62,9 +61,8 @@ export function formatResonance(raw, movementKey) {
   ];
 
   let best = null;
-  // Prefer slightly larger chunks (4–5) so the extra @ W# still fits
   for (const tpl of templates) {
-    for (let chunk = 4; chunk <= 5; chunk++) {
+    for (let chunk = 3; chunk <= 5; chunk++) {
       const grad = colorizeGradient(m.full, palette, chunk);
       const cand = tpl(grad);
       if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
@@ -76,7 +74,7 @@ export function formatResonance(raw, movementKey) {
 
   if (!best) {
     for (const tpl of templates) {
-      for (let chunk = 3; chunk <= 6; chunk++) {
+      for (let chunk = 2; chunk <= 6; chunk++) {
         const grad = colorizeGradient(m.full, palette, chunk);
         const cand = tpl(grad);
         if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
@@ -99,7 +97,7 @@ export function formatResonance(raw, movementKey) {
     world,
     output: best,
     count,
-    error: count > LIMIT ? 'Could not fit essential details under 130 characters.' : ''
+    error: count > LIMIT ? 'Could not fit essential details under 140 characters.' : ''
   };
 }
 
@@ -119,10 +117,10 @@ if (typeof document !== 'undefined') {
     const r = formatResonance(input.value, selectedMovement());
     output.value = r.output || '';
     preview.replaceChildren();
-    countEl.textContent = `${r.count || 0}/130 characters (including codes)${r.output ? ' · ' + Math.max(0, LIMIT - r.count) + ' remaining' : ''}`;
+    countEl.textContent = `${r.count || 0}/140 characters (including codes)${r.output ? ' · ' + Math.max(0, LIMIT - r.count) + ' remaining' : ''}`;
     copy.disabled = !r.ok;
     status.textContent = r.output
-      ? `Movement: ${r.movement}.${r.world ? ' World: ' + r.world + '.' : ''} Coordinates: ${r.coords}. ${r.error || 'Fitted under 130. Ready to copy.'}`
+      ? `Movement: ${r.movement}.${r.world ? ' World: ' + r.world + '.' : ''} Coordinates: ${r.coords}. ${r.error || 'Fitted under 140. Ready to copy.'}`
       : r.error;
 
     if (r.output) {
