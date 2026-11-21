@@ -19,7 +19,7 @@ function extractCoords(raw) {
   return m ? `(${m[1]},${m[2]})` : null;
 }
 
-function colorize(text, palette, chunkSize) {
+function colorizeGradient(text, palette, chunkSize) {
   if (!text) return '';
   let result = '';
   let idx = 0;
@@ -32,15 +32,6 @@ function colorize(text, palette, chunkSize) {
   return result;
 }
 
-function buildCandidates(phrase, palette, coords) {
-  const candidates = [];
-  for (let chunk = 6; chunk >= 2; chunk--) {
-    const colored = colorize(phrase, palette, chunk);
-    candidates.push(`${colored} ${coords}`);
-  }
-  return candidates;
-}
-
 export function formatResonance(raw, movementKey) {
   const coords = extractCoords(raw);
   if (!coords) return { ok: false, error: 'No coordinates found. Paste a location that includes (x,y).' };
@@ -48,25 +39,38 @@ export function formatResonance(raw, movementKey) {
   const m = movements[movementKey] || movements.terror;
   const palette = PALETTES[movementKey] || PALETTES.terror;
 
-  const phrases = [
-    `Join us! NONSTOP ${m.full} Spam`,
-    `Join us! NONSTOP ${m.name} Spam`,
-    `NONSTOP ${m.full} Spam`,
-    `NONSTOP ${m.name} Spam`,
-    `Join ${m.name} Spam`,
-    `${m.name} Spam`,
-    m.name
+  // Preferred structure: #WJoin us! #YNONSTOP [gradient full name] #YSpam coords
+  const templates = [
+    (grad) => `#WJoin us! #YNONSTOP ${grad} #YSpam ${coords}`,
+    (grad) => `#WJoin us! #YNONSTOP ${grad} ${coords}`,
+    (grad) => `#YNONSTOP ${grad} #YSpam ${coords}`,
+    (grad) => `#YNONSTOP ${grad} ${coords}`,
+    (grad) => `${grad} #YSpam ${coords}`,
+    (grad) => `${grad} ${coords}`
   ];
 
   let best = null;
-  for (const phrase of phrases) {
-    const cands = buildCandidates(phrase, palette, coords);
-    for (const cand of cands) {
+  for (const tpl of templates) {
+    for (let chunk = 5; chunk >= 2; chunk--) {
+      const grad = colorizeGradient(m.full, palette, chunk);
+      const cand = tpl(grad);
       if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
         best = cand;
       }
     }
     if (best) break;
+  }
+
+  // Fallback to short name if needed
+  if (!best) {
+    for (let chunk = 5; chunk >= 2; chunk--) {
+      const grad = colorizeGradient(m.name, palette, chunk);
+      const cand = `#YNONSTOP ${grad} ${coords}`;
+      if (cand.length <= LIMIT) {
+        best = cand;
+        break;
+      }
+    }
   }
 
   if (!best) {
