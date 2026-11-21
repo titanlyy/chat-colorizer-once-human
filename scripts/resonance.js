@@ -7,28 +7,32 @@ const movements = {
   delight: { name: 'Movement of Delight', short: 'Delight', hex: 'FFFF00', css: '#FFFF00' }
 };
 
-const openings = [
-  '#WJOIN US!',
-  '#WSquad up!',
-  '#WRally up!',
-  '#WNeed help!',
-  '#WAll hands!',
-  ''
-];
-
-const calls = [
-  'Nonstop spam!',
-  'Come spam!',
-  'Join the fight!',
-  'Squad up now!',
-  'Bring the noise!',
-  'Let\'s go!',
-  ''
-];
-
 function extractCoords(raw) {
   const m = raw.match(/\(\s*([+-]?\d+(?:\.\d+)?)\s*,\s*([+-]?\d+(?:\.\d+)?)\s*\)/);
   return m ? `(${m[1]},${m[2]})` : null;
+}
+
+// Sunrise gradient palette (warm reds → oranges → yellow)
+const SUNRISE = ['FF5858', 'FF6938', 'FB8F23', 'FCB138', 'FFEB46', 'FCB138', 'FB8F23'];
+
+function colorizeGradient(text, palette) {
+  if (!text) return '';
+  const words = text.split(' ');
+  let result = '';
+  let colorIdx = 0;
+  for (let i = 0; i < words.length; i++) {
+    if (i > 0) result += ' ';
+    const word = words[i];
+    // Split longer words into 2–4 character chunks for the gradient effect
+    const chunkSize = Math.max(2, Math.ceil(word.length / 3));
+    for (let j = 0; j < word.length; j += chunkSize) {
+      const chunk = word.slice(j, j + chunkSize);
+      const hex = palette[colorIdx % palette.length];
+      result += `#c${hex}${chunk}`;
+      colorIdx++;
+    }
+  }
+  return result;
 }
 
 export function formatResonance(raw, movementKey) {
@@ -36,36 +40,19 @@ export function formatResonance(raw, movementKey) {
   if (!coords) return { ok: false, error: 'No coordinates found. Paste a location that includes (x,y).' };
 
   const m = movements[movementKey] || movements.terror;
-  const core = `#c${m.hex}${m.name} #W${coords}`;
 
-  const candidates = [core];
-  for (const open of openings) {
-    for (const call of calls) {
-      const parts = [];
-      if (open) parts.push(open);
-      parts.push(`#c${m.hex}${m.short}`);
-      if (call) parts.push(`#Y${call}`);
-      parts.push(`#W${coords}`);
-      candidates.push(parts.join(' '));
-    }
+  let output = '';
+  if (movementKey === 'terror') {
+    const phrase = 'Join us! NONSTOP Terror Movement Spam';
+    const colored = colorizeGradient(phrase, SUNRISE);
+    output = `${colored} #W${coords}`;
+  } else {
+    // Fallback for other movements (can expand later)
+    const core = `#c${m.hex}${m.name} #W${coords}`;
+    output = core;
   }
 
-  // Also try full name versions
-  for (const open of openings.slice(0, 3)) {
-    for (const call of calls.slice(0, 4)) {
-      const parts = [];
-      if (open) parts.push(open);
-      parts.push(`#c${m.hex}${m.name}`);
-      if (call) parts.push(`#Y${call}`);
-      parts.push(`#W${coords}`);
-      candidates.push(parts.join(' '));
-    }
-  }
-
-  const valid = candidates.filter(s => s.length <= LIMIT).sort((a, b) => b.length - a.length);
-  const output = valid[0] || core;
   const count = output.length;
-
   return {
     ok: count <= LIMIT,
     movement: m.name,
@@ -99,7 +86,6 @@ if (typeof document !== 'undefined') {
       : r.error;
 
     if (r.output) {
-      // Simple preview: split on known colour codes
       const parts = r.output.split(/(#c[0-9A-Fa-f]{6}|#[RGBYWK])/);
       let colour = '#ffffff';
       for (const part of parts) {
