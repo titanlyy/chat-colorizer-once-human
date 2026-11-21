@@ -8,7 +8,7 @@ const movements = {
 };
 
 const PALETTES = {
-  terror:  ['FFFFFF', 'F0D0FF', 'E0B0FF', 'D090FF', 'C070FF'], // white → light purple
+  terror:  ['FFFFFF', 'F5E0FF', 'E8C0FF', 'DBA0FF', 'C880FF'], // clear white → light purple
   lament:  ['A0FFFF', '70F0FF', '40E0FF', '10D0FF'],
   wrath:   ['FFA0A0', 'FF7070', 'FF4040', 'FF1010'],
   delight: ['FFFFA0', 'FFFF70', 'FFFF40', 'FFFF10']
@@ -49,8 +49,9 @@ export function formatResonance(raw, movementKey) {
   ];
 
   let best = null;
+  // Prefer smaller chunks (3–4) so the white→purple gradient is visible
   for (const tpl of templates) {
-    for (let chunk = 5; chunk >= 2; chunk--) {
+    for (let chunk = 3; chunk <= 4; chunk++) {
       const grad = colorizeGradient(m.full, palette, chunk);
       const cand = tpl(grad);
       if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
@@ -60,14 +61,17 @@ export function formatResonance(raw, movementKey) {
     if (best) break;
   }
 
+  // Fallback to other chunk sizes if needed
   if (!best) {
-    for (let chunk = 5; chunk >= 2; chunk--) {
-      const grad = colorizeGradient(m.name, palette, chunk);
-      const cand = `#YNONSTOP ${grad} ${coords}`;
-      if (cand.length <= LIMIT) {
-        best = cand;
-        break;
+    for (const tpl of templates) {
+      for (let chunk = 2; chunk <= 6; chunk++) {
+        const grad = colorizeGradient(m.full, palette, chunk);
+        const cand = tpl(grad);
+        if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
+          best = cand;
+        }
       }
+      if (best) break;
     }
   }
 
