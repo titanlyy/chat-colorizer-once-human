@@ -1,10 +1,10 @@
 export const LIMIT = 130;
 
 const movements = {
-  terror:  { name: 'Terror',  full: 'Movement of Terror',  short: 'Terror' },
-  lament:  { name: 'Lament',  full: 'Movement of Lament',  short: 'Lament' },
-  wrath:   { name: 'Wrath',   full: 'Movement of Wrath',   short: 'Wrath' },
-  delight: { name: 'Delight', full: 'Movement of Delight', short: 'Delight' }
+  terror:  { name: 'Terror',  full: 'Movement of Terror' },
+  lament:  { name: 'Lament',  full: 'Movement of Lament' },
+  wrath:   { name: 'Wrath',   full: 'Movement of Wrath' },
+  delight: { name: 'Delight', full: 'Movement of Delight' }
 };
 
 const PALETTES = {
@@ -36,7 +36,7 @@ function buildCandidates(phrase, palette, coords) {
   const candidates = [];
   for (let chunk = 6; chunk >= 2; chunk--) {
     const colored = colorize(phrase, palette, chunk);
-    candidates.push(`${colored} #W${coords}`);
+    candidates.push(`${colored} ${coords}`);
   }
   return candidates;
 }
@@ -70,7 +70,7 @@ export function formatResonance(raw, movementKey) {
   }
 
   if (!best) {
-    best = `#c${palette[0]}${m.name} #W${coords}`;
+    best = `#c${palette[0]}${m.name} ${coords}`;
   }
 
   const count = best.length;
