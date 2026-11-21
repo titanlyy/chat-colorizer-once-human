@@ -1,18 +1,17 @@
 export const LIMIT = 130;
 
 const movements = {
-  terror:  { name: 'Movement of Terror',  short: 'Terror',  hex: 'AA00FF', css: '#AA00FF' },
-  lament:  { name: 'Movement of Lament',  short: 'Lament',  hex: '00FFFF', css: '#00FFFF' },
-  wrath:   { name: 'Movement of Wrath',   short: 'Wrath',   hex: 'FF0000', css: '#FF0000' },
-  delight: { name: 'Movement of Delight', short: 'Delight', hex: 'FFFF00', css: '#FFFF00' }
+  terror:  { name: 'Terror',  full: 'Movement of Terror',  short: 'Terror' },
+  lament:  { name: 'Lament',  full: 'Movement of Lament',  short: 'Lament' },
+  wrath:   { name: 'Wrath',   full: 'Movement of Wrath',   short: 'Wrath' },
+  delight: { name: 'Delight', full: 'Movement of Delight', short: 'Delight' }
 };
 
-// Gradient palettes
 const PALETTES = {
-  terror:  ['D9A0FF', 'C070FF', 'AA40FF', '9010FF', 'AA40FF', 'C070FF'], // light purple → deeper purple
-  lament:  ['A0FFFF', '70F0FF', '40E0FF', '10D0FF', '40E0FF', '70F0FF'], // light cyan → deeper cyan
-  wrath:   ['FFA0A0', 'FF7070', 'FF4040', 'FF1010', 'FF4040', 'FF7070'], // light red → deeper red
-  delight: ['FFFFA0', 'FFFF70', 'FFFF40', 'FFFF10', 'FFFF40', 'FFFF70']  // light yellow → deeper yellow
+  terror:  ['D9A0FF', 'C070FF', 'AA40FF', '9010FF'],
+  lament:  ['A0FFFF', '70F0FF', '40E0FF', '10D0FF'],
+  wrath:   ['FFA0A0', 'FF7070', 'FF4040', 'FF1010'],
+  delight: ['FFFFA0', 'FFFF70', 'FFFF40', 'FFFF10']
 };
 
 function extractCoords(raw) {
@@ -20,23 +19,26 @@ function extractCoords(raw) {
   return m ? `(${m[1]},${m[2]})` : null;
 }
 
-function colorizeGradient(text, palette) {
+function colorize(text, palette, chunkSize) {
   if (!text) return '';
-  const words = text.split(' ');
   let result = '';
-  let colorIdx = 0;
-  for (let i = 0; i < words.length; i++) {
-    if (i > 0) result += ' ';
-    const word = words[i];
-    const chunkSize = Math.max(2, Math.ceil(word.length / 3));
-    for (let j = 0; j < word.length; j += chunkSize) {
-      const chunk = word.slice(j, j + chunkSize);
-      const hex = palette[colorIdx % palette.length];
-      result += `#c${hex}${chunk}`;
-      colorIdx++;
-    }
+  let idx = 0;
+  for (let i = 0; i < text.length; i += chunkSize) {
+    const chunk = text.slice(i, i + chunkSize);
+    const hex = palette[idx % palette.length];
+    result += `#c${hex}${chunk}`;
+    idx++;
   }
   return result;
+}
+
+function buildCandidates(phrase, palette, coords) {
+  const candidates = [];
+  for (let chunk = 6; chunk >= 2; chunk--) {
+    const colored = colorize(phrase, palette, chunk);
+    candidates.push(`${colored} #W${coords}`);
+  }
+  return candidates;
 }
 
 export function formatResonance(raw, movementKey) {
@@ -46,25 +48,39 @@ export function formatResonance(raw, movementKey) {
   const m = movements[movementKey] || movements.terror;
   const palette = PALETTES[movementKey] || PALETTES.terror;
 
-  const phrases = {
-    terror:  'Join us! NONSTOP Terror Movement Spam',
-    lament:  'Join us! NONSTOP Lament Movement Spam',
-    wrath:   'Join us! NONSTOP Wrath Movement Spam',
-    delight: 'Join us! NONSTOP Delight Movement Spam'
-  };
+  const phrases = [
+    `Join us! NONSTOP ${m.full} Spam`,
+    `Join us! NONSTOP ${m.name} Spam`,
+    `NONSTOP ${m.full} Spam`,
+    `NONSTOP ${m.name} Spam`,
+    `Join ${m.name} Spam`,
+    `${m.name} Spam`,
+    m.name
+  ];
 
-  const phrase = phrases[movementKey] || phrases.terror;
-  const colored = colorizeGradient(phrase, palette);
-  const output = `${colored} #W${coords}`;
-  const count = output.length;
+  let best = null;
+  for (const phrase of phrases) {
+    const cands = buildCandidates(phrase, palette, coords);
+    for (const cand of cands) {
+      if (cand.length <= LIMIT && (!best || cand.length > best.length)) {
+        best = cand;
+      }
+    }
+    if (best) break;
+  }
 
+  if (!best) {
+    best = `#c${palette[0]}${m.name} #W${coords}`;
+  }
+
+  const count = best.length;
   return {
     ok: count <= LIMIT,
-    movement: m.name,
+    movement: m.full,
     coords,
-    output,
+    output: best,
     count,
-    error: count > LIMIT ? 'Essential details exceed 130 characters.' : ''
+    error: count > LIMIT ? 'Could not fit essential details under 130 characters.' : ''
   };
 }
 
@@ -87,7 +103,7 @@ if (typeof document !== 'undefined') {
     countEl.textContent = `${r.count || 0}/130 characters (including codes)${r.output ? ' · ' + Math.max(0, LIMIT - r.count) + ' remaining' : ''}`;
     copy.disabled = !r.ok;
     status.textContent = r.output
-      ? `Movement: ${r.movement}. Coordinates: ${r.coords}. ${r.error || 'Ready to copy and test in-game.'}`
+      ? `Movement: ${r.movement}. Coordinates: ${r.coords}. ${r.error || 'Fitted under 130. Ready to copy.'}`
       : r.error;
 
     if (r.output) {
