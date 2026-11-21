@@ -19,7 +19,7 @@ jobs:
       - name: Prepare public site files
         run: |
           mkdir -p _site
-          cp index.html invites.html resonance.html favicon.svg LICENSE _site/
+          cp index.html colorizer.html invites.html resonance.html favicon.svg LICENSE _site/
           cp -R css scripts font icons images _site/
           ls -la _site
       - uses: actions/upload-pages-artifact@v5
