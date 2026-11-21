@@ -8,7 +8,7 @@ const movements = {
 };
 
 const PALETTES = {
-  terror:  ['FFFFFF', 'F5E0FF', 'E8C0FF', 'DBA0FF', 'C880FF'], // white → light purple, one way
+  terror:  ['FFFFFF', 'F5E0FF', 'E8C0FF', 'DBA0FF', 'C880FF'],
   lament:  ['A0FFFF', '70F0FF', '40E0FF', '10D0FF'],
   wrath:   ['FFA0A0', 'FF7070', 'FF4040', 'FF1010'],
   delight: ['FFFFA0', 'FFFF70', 'FFFF40', 'FFFF10']
@@ -28,7 +28,6 @@ function colorizeGradient(text, palette, chunkSize) {
   const n = chunks.length;
   let result = '';
   for (let i = 0; i < n; i++) {
-    // Map 0..n-1 onto 0..palette.length-1 without wrapping
     const progress = n <= 1 ? 0 : i / (n - 1);
     const colorIdx = Math.round(progress * (palette.length - 1));
     const hex = palette[Math.min(colorIdx, palette.length - 1)];
@@ -45,8 +44,8 @@ export function formatResonance(raw, movementKey) {
   const palette = PALETTES[movementKey] || PALETTES.terror;
 
   const templates = [
-    (grad) => `#WJoin us! #YNONSTOP ${grad} #YSpam ${coords}`,
-    (grad) => `#WJoin us! #YNONSTOP ${grad} ${coords}`,
+    (grad) => `#cFF6B00Join us! #YNONSTOP ${grad} #YSpam ${coords}`,
+    (grad) => `#cFF6B00Join us! #YNONSTOP ${grad} ${coords}`,
     (grad) => `#YNONSTOP ${grad} #YSpam ${coords}`,
     (grad) => `#YNONSTOP ${grad} ${coords}`,
     (grad) => `${grad} #YSpam ${coords}`,
