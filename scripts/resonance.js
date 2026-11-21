@@ -8,7 +8,7 @@ const movements = {
 };
 
 const PALETTES = {
-  terror:  ['D9A0FF', 'C070FF', 'AA40FF', '9010FF'],
+  terror:  ['FFFFFF', 'F0D0FF', 'E0B0FF', 'D090FF', 'C070FF'], // white → light purple
   lament:  ['A0FFFF', '70F0FF', '40E0FF', '10D0FF'],
   wrath:   ['FFA0A0', 'FF7070', 'FF4040', 'FF1010'],
   delight: ['FFFFA0', 'FFFF70', 'FFFF40', 'FFFF10']
@@ -39,7 +39,6 @@ export function formatResonance(raw, movementKey) {
   const m = movements[movementKey] || movements.terror;
   const palette = PALETTES[movementKey] || PALETTES.terror;
 
-  // Preferred structure: #WJoin us! #YNONSTOP [gradient full name] #YSpam coords
   const templates = [
     (grad) => `#WJoin us! #YNONSTOP ${grad} #YSpam ${coords}`,
     (grad) => `#WJoin us! #YNONSTOP ${grad} ${coords}`,
@@ -61,7 +60,6 @@ export function formatResonance(raw, movementKey) {
     if (best) break;
   }
 
-  // Fallback to short name if needed
   if (!best) {
     for (let chunk = 5; chunk >= 2; chunk--) {
       const grad = colorizeGradient(m.name, palette, chunk);
