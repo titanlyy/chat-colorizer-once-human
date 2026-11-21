@@ -44,11 +44,11 @@ export function formatResonance(raw, movementKey) {
   const palette = PALETTES[movementKey] || PALETTES.terror;
 
   const templates = [
-    (grad) => `#cFF6B00Join us! #YNONSTOP ${grad} #YSpam ${coords}`,
-    (grad) => `#cFF6B00Join us! #YNONSTOP ${grad} ${coords}`,
-    (grad) => `#YNONSTOP ${grad} #YSpam ${coords}`,
-    (grad) => `#YNONSTOP ${grad} ${coords}`,
-    (grad) => `${grad} #YSpam ${coords}`,
+    (grad) => `#cFF2E9AJoin us! #c00E5FFNONSTOP ${grad} #c00E5FFSpam ${coords}`,
+    (grad) => `#cFF2E9AJoin us! #c00E5FFNONSTOP ${grad} ${coords}`,
+    (grad) => `#c00E5FFNONSTOP ${grad} #c00E5FFSpam ${coords}`,
+    (grad) => `#c00E5FFNONSTOP ${grad} ${coords}`,
+    (grad) => `${grad} #c00E5FFSpam ${coords}`,
     (grad) => `${grad} ${coords}`
   ];
 
