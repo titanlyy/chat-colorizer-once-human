@@ -9,7 +9,7 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,7 +24,8 @@ jobs:
           mkdir -p _site
           cp index.html invites.html resonance.html favicon.svg LICENSE _site/
           cp -R css scripts font icons images _site/
-      - uses: actions/upload-pages-artifact@v3
+          ls -la _site
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
       - name: Deploy
